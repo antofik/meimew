@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="file share,upload,download,store" />
+	<meta name="description" content="File sharing host" />
+    <title>{{ name }}</title>
+    <link rel="stylesheet" type="text/css" href="/media/css/stylesheet.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="/media/plugins/bootstrap-3.2.0/css/bootstrap.min.css" media="all"/>
+    <link rel="stylesheet" href="/media/plugins/jquery.fileupload.css">
+    <link rel="stylesheet" href="/media/plugins/jquery.fileupload-ui.css">
+
+    <script type="text/javascript" src="/media/plugins/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/media/plugins/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/media/plugins/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/media/plugins/jquery.fileupload.js"></script>
+    <script type="text/javascript" src="/media/plugins/jquery.iframe-transport.js"></script>
+    <script type="text/javascript" src="/media/plugins/jquery.fileupload-process.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <br/>
+        <br/>
+        <span class="btn btn-success fileinput-button">
+            <i class="glyphicon glyphicon-plus"></i>
+            <span>Select files...</span>
+            <input id="fileupload" type="file" name="files[]" multiple>
+        </span>
+        <br>
+        <br>
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar progress-bar-success"></div>
+        </div>
+        <div id="files" class="files">
+            {% for file in files %}
+                <a href='/={{ file.slug }}'>{{ file.filename }}</a>
+                <br/>
+            {% endfor %}
+
+        </div>
+    </div>
+
+<script>
+    $(function () {
+        'use strict';
+
+        $('#fileupload').fileupload({
+            url: '/upload/{{ name }}',
+            dataType: 'json',
+            autoUpload: true,
+            done: function (e, data) {
+                $.each(data.result.files, function (index, file) {
+                    $('<p/>').text(file.name).appendTo('#files');
+                });
+            },
+            start: function(){
+				$('#progress').show();
+			},
+            stop: function(){
+				$('#progress').hide();
+				try{ this.noty.close(); }catch(err){}
+			},
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progress .progress-bar').css(
+                    'width',
+                    progress + '%'
+                );
+            }
+        })
+        .prop('disabled', !$.support.fileInput)
+        .parent().addClass($.support.fileInput ? undefined : 'disabled');
+    });
+    </script>
+
+</body>
+</html>
