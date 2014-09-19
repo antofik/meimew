@@ -9,8 +9,21 @@ import string
 from django.template.defaultfilters import filesizeformat
 
 
-def home(request):    
-    return render_to_response('home.html', {}, context_instance=RequestContext(request))
+def home(request):
+    backgrounds = [
+        ("white", "rgba(114, 79, 79, 1)"),
+        ("#581D1D", "white"),
+        ("#383434", "white"),
+        ("#474429", "white"),
+        ("#470D3C", "white"),
+        ("#120D47", "white"),
+        ("#0D4047", "white"),
+        ("#24470D", "white"),
+        ("#47240D", "white"),
+        ("#111111", "white"),
+    ]
+    background, color = random.choice(backgrounds)
+    return render_to_response('home.html', {'background': background, 'color': color}, context_instance=RequestContext(request))
 
 
 def entry(request, name):
