@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+# coding=utf-8
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
@@ -57,11 +56,7 @@ def upload(request, name):
 
         uploaded = [{'name': filename, 'size': filesizeformat(file_size), 'slug': entry.slug, 'date': entry.created.date().isoformat()}]
 
-        mimetype = 'text/plain'
-        if 'HTTP_ACCEPT_ENCODING' in request.META.keys():
-            if "application/json" in request.META['HTTP_ACCEPT_ENCODING']:
-                mimetype = 'application/json'
-        return HttpResponse(json.dumps({'files': uploaded}), mimetype=mimetype)
+        return HttpResponse(json.dumps({'files': uploaded}))
     else:
         raise Http404
 
