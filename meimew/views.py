@@ -6,6 +6,7 @@ import json
 from models import File
 import random
 import string
+from django.template.defaultfilters import filesizeformat
 
 
 def home(request):    
@@ -13,7 +14,7 @@ def home(request):
 
 
 def entry(request, name):
-    files = File.objects.filter(username=name)
+    files = File.objects.filter(username=name).order_by('-created')
     return render_to_response('entry.html', {'name': name, 'files': files}, context_instance=RequestContext(request))
 
 
@@ -39,7 +40,7 @@ def upload(request, name):
         entry.data = file
         entry.save()
 
-        uploaded = [{'name': filename, 'size': file_size}]
+        uploaded = [{'name': filename, 'size': filesizeformat(file_size), 'slug': entry.slug, 'date': entry.created.date().isoformat()}]
 
         mimetype = 'text/plain'
         if 'HTTP_ACCEPT_ENCODING' in request.META.keys():
@@ -53,6 +54,8 @@ def upload(request, name):
 def download(request, slug):
     try:
         file = File.objects.get(slug=slug)
+        file.downloaded_count += 1
+        file.save()
         return redirect("/media/user-files/%s/%s/%s" % (file.username, file.created.date().isoformat(), file.filename))
     except:
         raise Http404
