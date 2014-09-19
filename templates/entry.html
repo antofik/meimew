@@ -65,7 +65,7 @@
 
 <script type='template'>
     <div>
-        <span class='btn copy' data-clipboard-text='/=%slug%' style='float:left'><i class='glyphicon glyphicon-link'></i>
+        <span class='btn copy' data-clipboard-text='http://%host%/=%slug%' style='float:left'><i class='glyphicon glyphicon-link'></i>
         </span><a href='/=%slug%'>%filename%</a>
         <br/>
         <span style='font-size: 0.8em; color: gray; width: 60px; display:inline-block'>%size%</span>
@@ -87,6 +87,7 @@
                     var html = $("script[type=template]").html()
                         .replace( /%filename%/g, file.name)
                         .replace( /%size%/g, file.size)
+                        .replace( /%host%/g, location.host)
                         .replace( /%slug%/g, file.slug);
                     var item = $(html).appendTo('#just-loaded');
 
