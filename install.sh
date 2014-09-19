@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 mkdir logs
 sudo ln -s /server/www/meimew/nginx.conf /etc/nginx/conf.d/meimew.conf
