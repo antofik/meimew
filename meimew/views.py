@@ -18,7 +18,7 @@ def entry(request, name):
 
 
 def generate_slug(N):
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
+    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(N))
 
 
 def upload(request, name):

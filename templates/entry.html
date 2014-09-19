@@ -25,13 +25,14 @@
         <br/>
         <span class="btn btn-success fileinput-button">
             <i class="glyphicon glyphicon-plus"></i>
-            <span>Select files...</span>
+            <span>Upload files...</span>
             <input id="fileupload" type="file" name="files[]" multiple>
         </span>
+        <span style='color: rgb(236,236,236); float: right; font-size:42px;' class='hidden-xs'>drag file to upload</span>
         <br>
         <br>
-        <div id="progress" class="progress hidden">
-            <div class="progress-bar progress-bar-success"></div>
+        <div id="progress" class="progress" style='position: fixed; left: 2px; right: 2px; top: 2px;'>
+            <div class="progress-bar progress-bar-success" style='width: 0%;'></div>
         </div>
         <div id="files" class="files">
             {% for file in files %}
@@ -46,6 +47,8 @@
     $(function () {
         'use strict';
 
+        var progressBar = $('#progress .progress-bar');
+
         $('#fileupload').fileupload({
             url: '/upload/{{ name }}',
             dataType: 'json',
@@ -56,18 +59,15 @@
                 });
             },
             start: function(){
-				$('#progress').show();
+				//$('#progress').show();
 			},
             stop: function(){
-				$('#progress').hide();
-				try{ this.noty.close(); }catch(err){}
+				//$('#progress').hide();
+                progressBar.css('width', '0%');
 			},
             progressall: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
-                $('#progress .progress-bar').css(
-                    'width',
-                    progress + '%'
-                );
+                progressBar.css('width', progress + '%' );
             }
         })
         .prop('disabled', !$.support.fileInput)

@@ -56,3 +56,4 @@ target/
 .idea/
 media/user-files/
 localsettings.py
+db.sqlite3
