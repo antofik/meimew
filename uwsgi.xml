@@ -1,0 +1,13 @@
+<uwsgi>
+    <socket>/server/www/meimew/uwsgi.sock</socket>
+    <plugins>python</plugins>
+    <pythonpath>/server/www/meimew</pythonpath>
+    <module>wsgi</module>
+    <processes>50</processes>
+    <max-requests>5000</max-requests>
+    <buffer-size>32768</buffer-size>
+    <harakiri>300000000</harakiri>
+    <reload-mercy>8</reload-mercy>
+    <master />
+    <no-orphans />
+</uwsgi>
