@@ -11,7 +11,7 @@
     <script type="text/javascript" src="/media/plugins/bootstrap-3.2.0/js/bootstrap.min.js"></script>
 </head>
 
-<body style='background-color: {{ background }}'>
+<body style='background-color: {{ background }}; height: 100%'>
     <div >
         <div class='hidden-xs' style='font-size: 128px; font-weight: bold; color: rgba(236,236,236,1); position: absolute; top: 12px; left: 64px;'>Mei Mew</div>
         <div class='hidden-xs' style='position: absolute; top: 160px; left: 400px; font-size: 18px; color: {{ color }}'>File exchange point</div>
@@ -22,9 +22,9 @@
         <div class='visible-xs' style='border: solid 0 rgba(236,236,236,1); border-top-width: 1px; width: auto; margin-top: 106px; margin-left: 200px; margin-bottom: 8px;'></div>
 
         <div class='container'>
-            <div style='margin: auto; width: 200px; margin-top: 264px;'>
-                <input type='text' placeholder="Storage?" style='width: 200px;' />
-                <button class='btn visible-xs' style='width: 200px; margin-top: 16px; color: rgba(255,255,255,1);background: rgba(0,0,0,0.3); border-radius: 0px;'>Go</button>
+            <div style='margin: auto; width: 200px; margin-top: 40%;'>
+                <input id='name' type='text' placeholder="Storage?" style='width: 200px;' />
+                <button class='btn go' style='width: 200px; margin-top: 16px; color: rgba(255,255,255,1);background: rgba(0,0,0,0.3); border-radius: 0px;'>Go</button>
             </div>
         </div>
 
@@ -35,7 +35,25 @@
 
 
 <script>
+    function randomString() {
+        var result = '';
+        var length = 4;
+        var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for (var i = length; i > 0; --i)
+            result += chars[Math.round(Math.random() * (chars.length - 1))];
+        return result;
+    }
+
+    function go() {
+            var value = $("#name").val() || "";
+            location.href = '/' + (value.length>0 ? value : randomString());
+    }
+
     $(function () {
+        $(".go").click(go);
+        $("#name").on("keydown", function(e){
+            if (e.keyCode===13) go();
+        });
      });
 
 </script>
