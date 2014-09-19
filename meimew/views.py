@@ -56,6 +56,6 @@ def download(request, slug):
         file = File.objects.get(slug=slug)
         file.downloaded_count += 1
         file.save()
-        return redirect("/media/user-files/%s/%s/%s" % (file.username, file.created.date().isoformat(), file.filename))
+        return redirect(file.data.url)
     except:
         raise Http404
