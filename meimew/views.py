@@ -47,8 +47,8 @@ def upload(request, name):
         file_size = wrapped_file.file.size
 
         entry = File()
-        entry.filename = filename
-        entry.username = name
+        entry.filename = unicode(filename)
+        entry.username = unicode(name)
         entry.size = file_size
         entry.slug = generate_slug(8)
         entry.data = file
