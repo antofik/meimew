@@ -65,10 +65,24 @@
 
 <script type='template'>
     <div>
-        <span class='btn copy' data-clipboard-text='http://%host%/=%slug%' style='float:left'><i class='glyphicon glyphicon-link'></i>
-        </span><a href='/=%slug%'>%filename%</a>
+        <span class='done hidden'>
+            <span class='btn copy' style='float:left'>
+                <i class='glyphicon glyphicon-link'></i>
+            </span>
+            <a href='/=%slug%'>%filename%</a>
+        </span>
+        <span class='temp'>
+            <span style='width: 14px; height: 14px; margin: 6px 12px; float:left'>
+                <i class='glyphicon glyphicon-upload'></i>
+            </span>
+            %filename%
+        </span>
+
         <br/>
-        <span style='font-size: 0.8em; color: gray; width: 60px; display:inline-block'>%size%</span>
+        <div class="progress progress-to-remove" style='width: 20%; height: 8px; position: relative;margin-bottom: 13px;'>
+            <div class="progress-bar progress-bar-success" style='width: 1%;'></div>
+        </div>
+        <span class='size done hidden' style='font-size: 0.8em; color: gray; width: 60px; display:inline-block'>%size%</span>
     </div>
 </script>
 
@@ -76,6 +90,7 @@
     $(function () {
         'use strict';
 
+        var map = {};
         var progressBar = $('#progress .progress-bar');
 
         $('#fileupload').fileupload({
@@ -84,23 +99,43 @@
             autoUpload: true,
             done: function (e, data) {
                 $.each(data.result.files, function (index, file) {
+                    var item = map[file.name];
+                    $('.progress', item).hide();
+                    $('.temp', item).hide();
+                    $('.done', item).removeClass('hidden');
+                    $('a', item)[0].href = '/=' + file.slug;
+                    $('.size', item).html(file.size);
+                    $('.copy', item).data('clipboard-text', 'http://' + location.host + '/=' + file.slug );
+                    var clipboard = new ZeroClipboard($('.copy', item));
+                    clipboard.on('copy', function(e){
+                        var link = $('.copy', item).data('clipboard-text');
+                        e.clipboardData.setData('text/plain', link);
+                    });
+                    clipboard.setData( "text/plain", 'http://' + location.host + '/=' + file.slug);
+                });
+            },
+            send: function (e, data) {
+                $.each(data.files, function (index, file) {
                     var html = $("script[type=template]").html()
                         .replace( /%filename%/g, file.name)
-                        .replace( /%size%/g, file.size)
+                        .replace( /%size%/g, '')
                         .replace( /%host%/g, location.host)
-                        .replace( /%slug%/g, file.slug);
-                    var item = $(html).appendTo('#just-loaded');
-
-                    new ZeroClipboard($(".copy"), item);
+                        .replace( /%slug%/g, '');
+                    map[file.name] = $(html).appendTo('#just-loaded');
                 });
             },
             start: function(){
-				//$('#progress').show();
 			},
             stop: function(){
-				//$('#progress').hide();
                 progressBar.css('width', '0%');
 			},
+            progress: function(e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $.each(data.files, function (index, file) {
+                    var progressBar = $('.progress  .progress-bar', map[file.name]);
+                    progressBar.css('width', progress + '%' );
+                });
+            },
             progressall: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
                 progressBar.css('width', progress + '%' );
