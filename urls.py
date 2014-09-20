@@ -15,9 +15,9 @@ if settings.DEBUG or True:
     )
 
 urlpatterns += patterns('',
-        url(r'^upload/(?P<name>[^\.\\\/]{1,64})', 'meimew.views.upload', name='upload'),
-        url(r'^get/(?P<slug>[^/\.]{1,64})', 'meimew.views.download', name='download'),
-        url(r'^\=(?P<slug>[^/\.]{1,64})', 'meimew.views.download', name='download'),
-        url(r'(?P<name>[^\.\\\/]{1,64})', 'meimew.views.entry', name='entry'),
+        url(r'^upload/(?P<name>[^\.\\\/\x00-\x20]{1,64})', 'meimew.views.upload', name='upload'),
+        url(r'^get/(?P<slug>[^/\.\x00-\x20]{1,64})', 'meimew.views.download', name='download'),
+        url(r'^\=(?P<slug>[^/\.\x00-\x20]{1,64})', 'meimew.views.download', name='download'),
+        url(r'(?P<name>[^\.\\\/\x00-\x20]{1,64})', 'meimew.views.entry', name='entry'),
         url(r'^.*$', 'meimew.views.home', name='home'),
     )
