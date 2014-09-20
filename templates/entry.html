@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="keywords" content="file share,upload,download,store" />
 	<meta name="description" content="File sharing host" />
-    <title>{{ name }}</title>
+    <title>Mei Mew {{ name }}</title>
     {% comment %}<link rel="stylesheet" type="text/css" href="/media/css/stylesheet.css" media="all"/>{% endcomment %}
     <link rel="stylesheet" type="text/css" href="/media/plugins/bootstrap-3.2.0/css/bootstrap.min.css" media="all"/>
     <link rel="stylesheet" href="/media/plugins/jquery.fileupload.css">
@@ -21,7 +21,13 @@
 </head>
 
 <body>
-    <div class="container">
+    <div id="progress2" class="progress" style='position: absolute; left: 0px; right: 0px; top: 0px;'>
+        <div class="progress-bar progress-bar-success" style='width: 0%;'></div>
+    </div>
+    <div class="container" style="border: solid 0 rgba(236,236,236,1); border-bottom-width: 1px; position: relative">
+        <div style="position: absolute; bottom: -20px; right: 0px; font-size: 12px;color: rgb(200,200,200);">
+            Don't worry, be easy...
+        </div>
         <br/>
         <br/>
         <span class="btn btn-success fileinput-button">
@@ -36,9 +42,6 @@
         <br>
         <br>
         <br>
-        <div id="progress" class="progress" style='position: fixed; left: 2px; right: 2px; top: 2px;'>
-            <div class="progress-bar progress-bar-success" style='width: 0%;'></div>
-        </div>
         <div id="files" class="files">
             <div id="just-loaded">
 
