@@ -8,6 +8,8 @@
     <buffer-size>32768</buffer-size>
     <harakiri>300000000</harakiri>
     <reload-mercy>8</reload-mercy>
+    <env>LANG=en_US.utf8</env>
+    <env>LC_ALL=en_US.utf8</env>
     <master />
     <no-orphans />
 </uwsgi>
