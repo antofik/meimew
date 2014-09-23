@@ -12,7 +12,7 @@ module.exports = function(grunt) {
 			'media/plugins/jquery.fileupload.js',
 			'media/plugins/jquery.iframe-transport.js',
 			'media/plugins/jquery.fileupload-process.js',
-			'media/plugins/ZeroClipboard.min.js',
+			'media/plugins/ZeroClipboard.min.js'
 		],
         dest: 'media/js/main.min.js'
       }
@@ -20,15 +20,26 @@ module.exports = function(grunt) {
 	cssmin: {
 		combine: {
 			files: {
-				'media/css/main.min.css': [
+				'media/css/main.css': [
 					'media/plugins/bootstrap-3.2.0/css/bootstrap.min.css',
 					'media/plugins/jquery.fileupload.css',
-					'media/plugins/jquery.fileupload-ui.css',
+					'media/plugins/jquery.fileupload-ui.css'
 				]
 			}
 		}
 	},
-	
+	uncss: {
+		dist: {
+			options: {
+				csspath: '../',
+				stylesheets: ['media/css/main.css'],
+                report: 'min'
+			},
+			files: {
+				'media/css/main.min.css': ['templates/home.html']
+			}
+		}
+	},	
 	copy: { 
 		main:{
 			files: [
@@ -37,14 +48,14 @@ module.exports = function(grunt) {
 				flatten: true,
 				cwd: 'media/plugins/',
 				src: ['ZeroClipboard.swf'], 
-				dest: 'media/js/',
+				dest: 'media/js/'
 			},		
 			{
 				expand: true,
 				flatten: true,
 				cwd: 'media/plugins/bootstrap-3.2.0/fonts/',
 				src: ['*.*'], 
-				dest: 'media/fonts/',
+				dest: 'media/fonts/'
 			},
 		]}
 	}	
@@ -54,7 +65,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-uncss');
 
-  grunt.registerTask('default', ['uglify', 'cssmin', 'copy']);
+  grunt.registerTask('default', ['uglify', 'cssmin', 'copy', 'uncss']);
 
 };
