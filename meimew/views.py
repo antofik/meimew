@@ -23,7 +23,7 @@ def home(request):
         ("#47240D", "white"),
         ("#111111", "white"),
     ]
-    background, color = random.choice(backgrounds)
+    background, color = backgrounds[0]# random.choice(backgrounds)
     return render_to_response('home.html', {'background': background, 'color': color}, context_instance=RequestContext(request))
 
 

@@ -5,10 +5,20 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="keywords" content="file share,upload,download,store" />
 	<meta name="description" content="File sharing host" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <title>Mei Mew</title>
     <link rel="stylesheet" type="text/css" href="/media/plugins/bootstrap-3.2.0/css/bootstrap.min.css" media="all"/>
+    <link rel="stylesheet" href="/media/plugins/jquery.fileupload.css">
+    <link rel="stylesheet" href="/media/plugins/jquery.fileupload-ui.css">
+
     <script type="text/javascript" src="/media/plugins/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/media/plugins/bootstrap-3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/media/plugins/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/media/plugins/jquery.fileupload.js"></script>
+    <script type="text/javascript" src="/media/plugins/jquery.iframe-transport.js"></script>
+    <script type="text/javascript" src="/media/plugins/jquery.fileupload-process.js"></script>
+    <script type="text/javascript" src="/media/plugins/ZeroClipboard.min.js"></script>
 
     <script>
         redindex = {id: 99};
@@ -27,9 +37,42 @@
         <div class='visible-xs' style='border: solid 0 rgba(236,236,236,1); border-top-width: 1px; width: auto; margin-top: 106px; margin-left: 200px; margin-bottom: 8px;'></div>
 
         <div class='container'>
-            <div style='margin: auto; width: 200px; margin-top: 40%;'>
-                <input id='name' type='text' placeholder="Need storage?" style='width: 200px;' />
-                <button class='btn go' style='width: 200px; margin-top: 16px; color: rgba(255,255,255,1);background: rgba(0,0,0,0.3); border-radius: 0px;'>Take one</button>
+            <div id="files" class="files" style='display:none; padding: 24px;margin: 24px 8px'>
+                <div id="main_link">
+                    <span class='btn copy btn-warning'>Copy link to all downlaods</span>
+                </div>
+                <br/>
+
+                <div id="just-loaded">
+
+                </div>
+                {% for file in files %}
+                        {% ifchanged file.created.date %}
+                            <div style='border: solid 0 rgb(236,236,236); border-top-width: 1px; margin-top: 16px;'></div>
+                            <div style='font-size: 18px; color: rgb(200,200,200); float: right'>{{ file.created|date:"F, d" }}</div>
+                            <br/>
+                        {% endifchanged %}
+                    <div>
+                        <span class='btn copy' data-clipboard-text='http://{{ request.META.HTTP_HOST }}/={{ file.slug }}' style='float:left'><i class='glyphicon glyphicon-link'></i>
+                        </span><a href='/={{ file.slug }}'>{{ file.filename }}</a>
+                        <br/>
+                        <span style='font-size: 0.8em; color: gray; width: 60px; display:inline-block'>{{ file.size|filesizeformat }}</span>
+                        {% if file.downloaded_count > 0 %}
+                            <span style='font-size: 0.8em; color: gray; display:inline-block'>downloaded: {{ file.downloaded_count }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            <div style='margin: auto; width: 200px; margin-top: 10%;'>
+                <!--<input id='name' type='text' placeholder="Need storage?" style='width: 200px;' />
+                <button class='btn go' style='width: 200px; margin-top: 16px; color: rgba(255,255,255,1);background: rgba(0,0,0,0.3); border-radius: 0px;'>Take one</button> -->
+                <span class="btn fileinput-button btn-lg" style="top: 16px; ">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Upload files...</span>
+                    <input id="fileupload" type="file" name="files[]" multiple>
+                </span>
             </div>
         </div>
 
@@ -38,29 +81,122 @@
         </div>
     </div>
 
+<script type='template'>
+    <div>
+        <span class='done hidden'>
+            <span class='btn copy' style='float:left'>
+                <i class='glyphicon glyphicon-link'></i>
+            </span>
+            <a href='/=%slug%'>%filename%</a>
+        </span>
+        <span class='temp'>
+            <span style='width: 14px; height: 14px; margin: 6px 12px; float:left'>
+                <i class='glyphicon glyphicon-upload'></i>
+            </span>
+            %filename%
+        </span>
+
+        <br/>
+        <div class="progress progress-to-remove" style='width: 20%; height: 8px; position: relative;margin-bottom: 13px;'>
+            <div class="progress-bar progress-bar-success" style='width: 1%;'></div>
+        </div>
+        <span class='size done hidden' style='font-size: 0.8em; color: gray; width: 60px; display:inline-block'>%size%</span>
+    </div>
+</script>
 
 <script>
-    function randomString() {
-        var result = '';
-        var length = 4;
-        var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        for (var i = length; i > 0; --i)
-            result += chars[Math.round(Math.random() * (chars.length - 1))];
-        return result;
-    }
-
-    function go() {
-            var value = $("#name").val() || "";
-            location.href = '/' + (value.length>0 ? value : randomString());
-    }
-
     $(function () {
-        $(".go").click(go);
-        $("#name").on("keydown", function(e){
-            if (e.keyCode===13) go();
-        });
-     });
+        'use strict';
 
+        function randomString(length) {
+            var result = '';
+            var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for (var i = length; i > 0; --i)
+                result += chars[Math.round(Math.random() * (chars.length - 1))];
+            return result;
+        }
+
+        function go() {
+                var value = $("#name").val() || "";
+                location.href = '/' + (value.length>0 ? value : randomString());
+        }
+
+        $(function () {
+            $(".go").click(go);
+            $("#name").on("keydown", function(e){
+                if (e.keyCode===13) go();
+            });
+         });
+
+        var map = {};
+        var progressBar = $('#progress .progress-bar');
+        var name = randomString(8);
+
+        var main_link = $("#main_link");
+       // $("a", main_link)[0].href = 'http://' + location.host + '/' + name;
+        $('.copy', main_link).data('clipboard-text', 'http://' + location.host + '/' + name);
+        var mainLinkClipboard = new ZeroClipboard($('.copy', main_link));
+        mainLinkClipboard.on('copy', function(e){
+            var link = $('.copy', main_link).data('clipboard-text');
+            e.clipboardData.setData('text/plain', link);
+        });
+        mainLinkClipboard.setData( "text/plain", 'http://' + location.host + '/' + name);
+
+        $('#fileupload').fileupload({
+            url: '/upload/' + name,
+            dataType: 'json',
+            autoUpload: true,
+            done: function (e, data) {
+                $.each(data.result.files, function (index, file) {
+                    var item = map[file.name];
+                    $('.progress', item).hide();
+                    $('.temp', item).hide();
+                    $('.done', item).removeClass('hidden');
+                    $('a', item)[0].href = '/=' + file.slug;
+                    $('.size', item).html(file.size);
+                    $('.copy', item).data('clipboard-text', 'http://' + location.host + '/=' + file.slug );
+                    var clipboard = new ZeroClipboard($('.copy', item));
+                    clipboard.on('copy', function(e){
+                        var link = $('.copy', item).data('clipboard-text');
+                        e.clipboardData.setData('text/plain', link);
+                    });
+                    clipboard.setData( "text/plain", 'http://' + location.host + '/=' + file.slug);
+                });
+            },
+            send: function (e, data) {
+                $.each(data.files, function (index, file) {
+                    var html = $("script[type=template]").html()
+                        .replace( /%filename%/g, file.name)
+                        .replace( /%size%/g, '')
+                        .replace( /%host%/g, location.host)
+                        .replace( /%slug%/g, '');
+                    map[file.name] = $(html).appendTo('#just-loaded');
+                });
+            },
+            start: function(){
+                $("#files").show();
+			},
+            stop: function(){
+                progressBar.css('width', '0%');
+			},
+            progress: function(e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $.each(data.files, function (index, file) {
+                    var progressBar = $('.progress  .progress-bar', map[file.name]);
+                    progressBar.css('width', progress + '%' );
+                });
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                progressBar.css('width', progress + '%' );
+            }
+        })
+        .prop('disabled', !$.support.fileInput)
+        .parent().addClass($.support.fileInput ? undefined : 'disabled');
+
+        new ZeroClipboard( $('.copy') );
+
+    });
 </script>
 
 </body>
