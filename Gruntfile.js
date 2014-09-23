@@ -7,7 +7,7 @@ module.exports = function(grunt) {
       build: {
         src: [
 			'media/plugins/jquery-1.11.1.min.js',
-			'media/plugins/bootstrap-3.2.0/js/bootstrap.min.js',
+			//'media/plugins/bootstrap-3.2.0/js/bootstrap.min.js',
 			'media/plugins/jquery.ui.widget.js',
 			'media/plugins/jquery.fileupload.js',
 			'media/plugins/jquery.iframe-transport.js',
@@ -20,7 +20,7 @@ module.exports = function(grunt) {
 	cssmin: {
 		combine: {
 			files: {
-				'media/css/main.css': [
+				'media/css/main.min.css': [
 					'media/plugins/bootstrap-3.2.0/css/bootstrap.min.css',
 					'media/plugins/jquery.fileupload.css',
 					'media/plugins/jquery.fileupload-ui.css'
@@ -67,6 +67,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-uncss');
 
-  grunt.registerTask('default', ['uglify', 'cssmin', 'copy', 'uncss']);
+  grunt.registerTask('default', ['uglify', 'cssmin', 'copy']);
 
 };
