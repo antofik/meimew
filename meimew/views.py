@@ -29,7 +29,7 @@ def home(request):
 
 def entry(request, name):
     files = File.objects.filter(username=name).order_by('-created')
-    return render_to_response('entry.html', {'name': name, 'files': files}, context_instance=RequestContext(request))
+    return render_to_response('home.html', {'name': name, 'files': files}, context_instance=RequestContext(request))
 
 
 def generate_slug(N):

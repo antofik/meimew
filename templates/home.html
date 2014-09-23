@@ -24,24 +24,37 @@
         redindex = {id: 99};
     </script>
     <script type="text/javascript" src="http://web.redhelper.ru/analytics/main.js" async="async"></script>
+
+    <style>
+        a:hover{
+            text-decoration: none;
+        }
+        #upload-button span:hover{
+            color: rgb(0,155,255) !important;
+        }
+    </style>
 </head>
 
 <body style='background-color: {{ background }}; height: 100%'>
     <div >
-        <div class='hidden-xs' style='font-size: 128px; font-weight: bold; color: rgba(236,236,236,1); position: absolute; top: 12px; left: 64px;'>Mei Mew</div>
-        <div class='hidden-xs' style='position: absolute; top: 160px; left: 400px; font-size: 18px; color: {{ color }}'>File exchange point</div>
-        <div class='hidden-xs' style='border: solid 0 rgba(236,236,236,1); border-top-width: 1px; width: auto; margin-top: 200px; margin-left: 400px;'></div>
+        <a href='/' class='hidden-xs' style='font-size: 128px; font-weight: bold; color: rgba(236,236,236,1); position: absolute; top: 12px; left: 64px;'>Mei Mew</a>
+        <a href='/' class='visible-xs' style='font-size: 64px; font-weight: bold; color: rgba(236,236,236,1); position: absolute; top: 12px; left: 64px;'>Mei Mew</a>
 
-        <div class='visible-xs' style='font-size: 64px; font-weight: bold; color: rgba(236,236,236,1); position: absolute; top: 12px; left: 64px;'>Mei Mew</div>
+        <div class='hidden-xs' style='position: absolute; top: 160px; left: 400px; font-size: 18px; color: {{ color }}'>File exchange point</div>
         <div class='visible-xs' style='position: absolute; top: 84px; left: 200px; font-size: 12px; color: {{ color }}'>File exchange point</div>
+
+        <span style='color: rgb(236,236,236); float: right; font-size:24px; margin:0px 12px;' class='hidden-xs'>drag file to upload</span>
+        <span style='color: rgb(236,236,236); float: right; font-size:24px;' class='visible-xs'>drag file to upload</span>
+
+        <div class='hidden-xs' style='border: solid 0 rgba(236,236,236,1); border-top-width: 1px; width: auto; margin-top: 200px; margin-left: 400px;'></div>
         <div class='visible-xs' style='border: solid 0 rgba(236,236,236,1); border-top-width: 1px; width: auto; margin-top: 106px; margin-left: 200px; margin-bottom: 8px;'></div>
 
         <div class='container'>
             <div id="files" class="files" style='padding: 24px;margin: 24px 8px'>
                 <div id="main_link">
-                    <span class='btn copy btn-warning' style='display: none'>Copy link to all downlaods</span>
+                    <span class='btn copy btn-warning' style='display: none'>Copy link to all downloads</span>
 
-                    <div id='upload-button' style='margin: auto; width: 200px; margin-top: 20%; position: absolute; top: -54px; left: 40%; color: rgb(0,115,221)'>
+                    <div id='upload-button' style='margin: auto; width: 200px; margin-top: 300px; position: absolute; top: -54px; left: 40%; color: rgb(0,115,221)'>
                         <span class="btn fileinput-button btn-lg" style="top: 16px; border: solid 1px rgba(0,115,221,0.2)">
                             <i class="glyphicon glyphicon-upload"></i>
                             <span>Upload files...</span>
@@ -49,7 +62,6 @@
                         </span>
                     </div>
                 </div>
-                <br/>
 
                 <div id="just-loaded">
 
@@ -74,7 +86,7 @@
             </div>
         </div>
 
-        <div style='position: fixed; bottom: 0; margin: 8px 64px; width: 200px; color: lightgray'>
+        <div style='position: fixed; bottom: 0; margin: 8px 64px; width: 200px; color: lightgray; pointer-events: none;'>
             Don't worry, be easy...
         </div>
     </div>
@@ -128,7 +140,7 @@
 
         var map = {};
         var progressBar = $('#progress .progress-bar');
-        var name = randomString(8);
+        var name = '{{ name }}' || randomString(8);
 
         var main_link = $("#main_link");
        // $("a", main_link)[0].href = 'http://' + location.host + '/' + name;
@@ -139,6 +151,31 @@
             e.clipboardData.setData('text/plain', link);
         });
         mainLinkClipboard.setData( "text/plain", 'http://' + location.host + '/' + name);
+
+        function start() {
+            $("#files").show();
+            var upload = $("#upload-button");
+            $('.btn', main_link).show();
+            $("i", upload).removeClass("glyphicon-upload");
+            $("i", upload).addClass("glyphicon-plus");
+            $(".btn", upload).css({'border-width':'0'});
+            upload.css({
+                'position': 'relative',
+                'margin': '0',
+                'top': '-54px',
+                'left': '220px'
+            });
+            try{
+                var currentUrl = location.pathname;
+                var requiredUrl = "/" + name;
+                if (window.history && history.pushState && currentUrl !== requiredUrl)
+                    history.pushState(null, "Mei Mew", requiredUrl);
+            }catch(e){}
+	    }
+
+        {% if files %}
+            $(start);
+        {% endif %}
 
         $('#fileupload').fileupload({
             url: '/upload/' + name,
@@ -171,25 +208,7 @@
                     map[file.name] = $(html).appendTo('#just-loaded');
                 });
             },
-            start: function(){
-                $("#files").show();
-                //$("#upload-button").css('margin-top', '24px');
-                var upload = $("#upload-button");
-                $('#main_link .btn').show();
-                $("i", upload).removeClass("glyphicon-upload");
-                $("i", upload).addClass("glyphicon-plus");
-                $(".btn", upload).css({'border-width':'0'});
-                upload.css({
-                    'position': 'relative',
-                    'margin': '0',
-                    'top': '-54px',
-                    'left': '220px'
-                });
-                try{
-                    if (window.history && history.pushState)
-                        history.pushState(null, "Mei Mew", "/" + name);
-                }catch(e){}
-			},
+            start: start,
             stop: function(){
                 progressBar.css('width', '0%');
 			},
@@ -209,7 +228,6 @@
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
 
         new ZeroClipboard( $('.copy') );
-
     });
 </script>
 
