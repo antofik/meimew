@@ -37,9 +37,17 @@
         <div class='visible-xs' style='border: solid 0 rgba(236,236,236,1); border-top-width: 1px; width: auto; margin-top: 106px; margin-left: 200px; margin-bottom: 8px;'></div>
 
         <div class='container'>
-            <div id="files" class="files" style='display:none; padding: 24px;margin: 24px 8px'>
+            <div id="files" class="files" style='padding: 24px;margin: 24px 8px'>
                 <div id="main_link">
-                    <span class='btn copy btn-warning'>Copy link to all downlaods</span>
+                    <span class='btn copy btn-warning' style='display: none'>Copy link to all downlaods</span>
+
+                    <div id='upload-button' style='margin: auto; width: 200px; margin-top: 20%; position: absolute; top: -54px; left: 40%; color: rgb(0,115,221)'>
+                        <span class="btn fileinput-button btn-lg" style="top: 16px; border: solid 1px rgba(0,115,221,0.2)">
+                            <i class="glyphicon glyphicon-upload"></i>
+                            <span>Upload files...</span>
+                            <input id="fileupload" type="file" name="files[]" multiple>
+                        </span>
+                    </div>
                 </div>
                 <br/>
 
@@ -63,16 +71,6 @@
                     </div>
                 {% endfor %}
 
-            </div>
-
-            <div id='upload-button' style='margin: auto; width: 200px; margin-top: 10%;'>
-                <!--<input id='name' type='text' placeholder="Need storage?" style='width: 200px;' />
-                <button class='btn go' style='width: 200px; margin-top: 16px; color: rgba(255,255,255,1);background: rgba(0,0,0,0.3); border-radius: 0px;'>Take one</button> -->
-                <span class="btn fileinput-button btn-lg" style="top: 16px; ">
-                    <i class="glyphicon glyphicon-plus"></i>
-                    <span>Upload files...</span>
-                    <input id="fileupload" type="file" name="files[]" multiple>
-                </span>
             </div>
         </div>
 
@@ -175,7 +173,22 @@
             },
             start: function(){
                 $("#files").show();
-                $("#upload-button").css('margin-top', '24px');
+                //$("#upload-button").css('margin-top', '24px');
+                var upload = $("#upload-button");
+                $('#main_link .btn').show();
+                $("i", upload).removeClass("glyphicon-upload");
+                $("i", upload).addClass("glyphicon-plus");
+                $(".btn", upload).css({'border-width':'0'});
+                upload.css({
+                    'position': 'relative',
+                    'margin': '0',
+                    'top': '-54px',
+                    'left': '220px'
+                });
+                try{
+                    if (window.history && history.pushState)
+                        history.pushState(null, "Mei Mew", "/" + name);
+                }catch(e){}
 			},
             stop: function(){
                 progressBar.css('width', '0%');
