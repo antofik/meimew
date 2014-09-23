@@ -57,3 +57,5 @@ target/
 media/user-files/
 localsettings.py
 db.sqlite3
+
+node_modules/
