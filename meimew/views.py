@@ -114,7 +114,7 @@ def family_expenses(request):
     if request.method == "POST":
         owner_id = str(request.POST["PhoneId"])
         family_password = str(request.POST["FamilyPassword"])
-        revision = int(request.POST["Revision"])
+        revision = float(request.POST["Revision"])
         items = json.loads(request.POST["Data"])
         items = [Item(item) for item in items]
         new_revision = time.time() + datetime.timedelta(days=3).total_seconds()
