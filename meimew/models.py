@@ -30,3 +30,14 @@ class File(models.Model):
         verbose_name = 'File'
         verbose_name_plural = 'Files'
         db_table = 'files'
+
+
+class Entry(models.Model):
+    id = models.CharField(max_length=32, primary_key=True)
+    data = models.TextField()
+    revision = models.FloatField()
+    owner_id = models.CharField(max_length=64)
+    family_id = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = 'entries'

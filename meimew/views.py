@@ -4,9 +4,11 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
 from django.core.files.uploadedfile import UploadedFile
 import json
-from models import File
+from models import File, Entry
 import random
 import string
+import time
+import datetime
 from django.template.defaultfilters import filesizeformat
 
 
@@ -23,8 +25,9 @@ def home(request):
         ("#47240D", "white"),
         ("#111111", "white"),
     ]
-    background, color = backgrounds[0]# random.choice(backgrounds)
-    return render_to_response('home.html', {'background': background, 'color': color}, context_instance=RequestContext(request))
+    background, color = backgrounds[0]  # random.choice(backgrounds)
+    return render_to_response('home.html', {'background': background, 'color': color},
+                              context_instance=RequestContext(request))
 
 
 def entry(request, name):
@@ -54,7 +57,8 @@ def upload(request, name):
         entry.data = file
         entry.save()
 
-        uploaded = [{'name': filename, 'size': filesizeformat(file_size), 'slug': entry.slug, 'date': entry.created.date().isoformat()}]
+        uploaded = [{'name': filename, 'size': filesizeformat(file_size), 'slug': entry.slug,
+                     'date': entry.created.date().isoformat()}]
 
         return HttpResponse(json.dumps({'files': uploaded}))
     else:
@@ -69,3 +73,90 @@ def download(request, slug):
         return redirect(file.data.url)
     except:
         raise Http404
+
+
+class Database(object):
+    @staticmethod
+    def get(revision, family_password):
+        result = []
+        entries = Entry.objects.filter(family_id=family_password, revision__gt=revision)
+        for entry in entries:
+            result.append(entry.data)
+        return result
+
+    @staticmethod
+    def store(new_revision, items):
+        for item in items:
+            Entry.objects.get_or_create(id=item.id, defaults={
+                'data': item.data,
+                'revision': new_revision,
+                'owner_id': item.owner_id,
+                'family_id': item.family_id
+            })
+
+    @staticmethod
+    def set_family_password(owner_id, family_password):
+        new_revision = time.time() + datetime.timedelta(days=3).total_seconds()
+        Entry.objects.filter(owner_id=owner_id).update(family_id=family_password, revision=new_revision)
+Database.items = []
+
+
+class Item:
+    def __init__(self, data):
+        self.id = data['Id']
+        self.data = data['Data']
+        self.revision = float(data['Revision'])
+        self.owner_id = data['Owner']
+        self.family_id = str(data['FamilyPassword'])
+
+
+def family_expenses(request):
+    if request.method == "POST":
+        owner_id = str(request.POST["PhoneId"])
+        family_password = str(request.POST["FamilyPassword"])
+        revision = int(request.POST["Revision"])
+        items = json.loads(request.POST["Data"])
+        items = [Item(item) for item in items]
+        new_revision = time.time() + datetime.timedelta(days=3).total_seconds()
+        Database.store(new_revision, items)
+        data = Database.get(revision, family_password)
+        return HttpResponse(json.dumps({"Revision": new_revision, "Data": data}))
+    else:
+        return redirect("/family-expensеs")
+
+def change_family(request):
+    if request.method == "POST":
+        owner_id = str(request.POST["PhoneId"])
+        family_password = str(request.POST["FamilyPassword"])
+        Database.set_family_password(owner_id, family_password)
+        return HttpResponse("ok")
+    else:
+        return redirect("/family-expensеs")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
