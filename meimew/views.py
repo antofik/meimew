@@ -87,12 +87,13 @@ class Database(object):
     @staticmethod
     def store(new_revision, items):
         for item in items:
-            Entry.objects.get_or_create(id=item.id, defaults={
+            obj, created = Entry.objects.get_or_create(id=item.id, defaults={
                 'data': item.data,
                 'revision': new_revision,
                 'owner_id': item.owner_id,
                 'family_id': item.family_id
             })
+            obj.save()
 
     @staticmethod
     def set_family_password(owner_id, family_password):

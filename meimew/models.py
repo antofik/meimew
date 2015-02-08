@@ -33,7 +33,7 @@ class File(models.Model):
 
 
 class Entry(models.Model):
-    id = models.CharField(max_length=32, primary_key=True)
+    id = models.CharField(max_length=36, primary_key=True)
     data = models.TextField()
     revision = models.FloatField()
     owner_id = models.CharField(max_length=64)
