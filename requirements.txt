@@ -1,0 +1,5 @@
+django==1.4.2
+mysql-python==1.2.3
+django-debug-toolbar
+mysql-connector-python
+
