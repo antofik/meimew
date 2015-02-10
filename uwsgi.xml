@@ -11,5 +11,6 @@
     <env>LANG=en_US.utf8</env>
     <env>LC_ALL=en_US.utf8</env>
     <master />
-    <no-orphans />
+	<no-orphans />
+	<virtualenv>/server/www/meimew/env/</virtualenv>
 </uwsgi>
